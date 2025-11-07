@@ -1,34 +1,50 @@
 export const notes = ["A", "B", "C", "D", "E", "F", "G"] as const;
 
+export type Alteration = -1 | 0 | 1;
+export type AlteredNote = {
+  note: Note;
+  alteration: Alteration;
+};
+
 export type Cadence = Array<Chord | undefined>;
-export type Note = (typeof notesSharp)[number];
+export type Note = (typeof notes)[number];
 export type Quality = keyof typeof quality;
 
 export type Chord = {
-  fundamental: Note;
-  quality?: Quality;
+  root: Note;
+  alteration: Alteration;
+  quality: Quality;
 };
 
 export const semiToneToNote = {
   0: "A",
-  1: "A#",
   2: "B",
   3: "C",
-  4: "C#",
   5: "D",
-  6: "D#",
   7: "E",
   8: "F",
-  9: "F#",
   10: "G",
-  11: "G#",
 } as const;
-export const notesSharp = Object.values(semiToneToNote);
 
-export function findSemiTone(note: Note): number {
+export function mapNoteToSemiTone(note: Note): number {
   return Number(
     Object.entries(semiToneToNote).find(([, n]) => n === note)?.[0],
   );
+}
+export function mapSemiToneToNote(semiTone: number): AlteredNote {
+  if (semiToneToNote[semiTone as keyof typeof semiToneToNote]) {
+    return {
+      note: semiToneToNote[semiTone as keyof typeof semiToneToNote],
+      alteration: 0,
+    };
+  }
+  if (semiToneToNote[(semiTone - 1) as keyof typeof semiToneToNote]) {
+    return {
+      note: semiToneToNote[(semiTone - 1) as keyof typeof semiToneToNote],
+      alteration: 1,
+    };
+  }
+  throw new Error("Impossible!");
 }
 
 export const quality = {

@@ -1,66 +1,100 @@
-import { type FC } from "react";
+import { type FC, useState } from "react";
 import {
+  type AlteredNote,
   type Chord,
   chordQualityNotationSuffix,
   type Note,
-  notesSharp,
+  notes,
   type Quality,
 } from "../notes.ts";
+import { Button } from "@/components/ui/button.tsx";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select.tsx";
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+} from "@/components/ui/drawer.tsx";
+import { getAlterationSign } from "@/lib/getAlterationSign.ts";
 
 export const ChordSelect: FC<{
   value: Chord | undefined;
   setValue: (v: Chord) => void;
 }> = ({ value, setValue }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [root, setRoot] = useState<AlteredNote | undefined>(undefined);
+
   return (
-    <div className="flex flex-col items-stretch">
-      <Select
-        value={value?.fundamental}
-        onValueChange={(fundamental) =>
-          setValue({ fundamental: fundamental as Note, quality: undefined })
-        }
-      >
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Fondamentale" />
-        </SelectTrigger>
-        <SelectContent>
-          {notesSharp.map((note, index) => (
-            <SelectItem key={index} value={note}>
-              {note}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Select
-        disabled={!value?.fundamental}
-        value={value?.quality}
-        onValueChange={(quality) =>
-          setValue({
-            fundamental: value!.fundamental,
-            quality: quality as Quality,
-          })
-        }
-      >
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Qualité" />
-        </SelectTrigger>
-        <SelectContent>
-          {Object.entries(chordQualityNotationSuffix).map(
-            ([quality, suffix]) => (
-              <SelectItem key={quality} value={quality}>
-                {value?.fundamental}
-                {suffix}
-              </SelectItem>
-            ),
+    <Drawer
+      onOpenChange={(isOpen) => {
+        setRoot(undefined);
+        setIsOpen(isOpen);
+      }}
+      open={isOpen}
+    >
+      <DrawerTrigger asChild>
+        <Button className="size-[100px]">
+          {value ? (
+            <>
+              {value.root}
+              {getAlterationSign(value.alteration)}
+              {chordQualityNotationSuffix[value.quality]}
+            </>
+          ) : (
+            "Select"
           )}
-        </SelectContent>
-      </Select>
-    </div>
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        {!root ? (
+          <div className="grid grid-rows-3 grid-cols-7 gap-2 p-4">
+            {notes.map((note, index) => (
+              <Button
+                key={index}
+                onClick={() => setRoot({ note, alteration: 1 })}
+              >
+                {note}#
+              </Button>
+            ))}
+            {notes.map((note, index) => (
+              <Button
+                key={index}
+                onClick={() => setRoot({ note, alteration: 0 })}
+              >
+                {note}
+              </Button>
+            ))}
+            {notes.map((note, index) => (
+              <Button
+                key={index}
+                onClick={() => setRoot({ note, alteration: -1 })}
+              >
+                {note}♭
+              </Button>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-rows-3 grid-cols-8 gap-2 p-4">
+            {Object.entries(chordQualityNotationSuffix).map(
+              ([quality, suffix]) => (
+                <Button
+                  key={quality}
+                  onClick={() => {
+                    setValue({
+                      root: `${root.note}` as Note,
+                      alteration: root?.alteration,
+                      quality: quality as Quality,
+                    });
+                    setIsOpen(false);
+                  }}
+                >
+                  {root.note}
+                  {getAlterationSign(root.alteration)}
+                  {suffix}
+                </Button>
+              ),
+            )}
+          </div>
+        )}
+      </DrawerContent>
+    </Drawer>
   );
 };

@@ -12,10 +12,12 @@ function App() {
   const outputCadence = transposeCadence(cadence, offset);
 
   return (
-    <div className="flex gap-8">
-      <CadenceInput cadence={cadence} setCadence={setCadence} />
+    <div className="flex gap-8 h-screen p-8">
       <OffsetInput offset={offset} setOffset={setOffset} />
-      <CadenceOutput outputCadence={outputCadence} />
+      <div className="grid grid-rows-2 gap-2 justify-items-center items-center">
+        <CadenceInput cadence={cadence} setCadence={setCadence} />
+        <CadenceOutput outputCadence={outputCadence} />
+      </div>
     </div>
   );
 }

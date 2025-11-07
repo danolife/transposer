@@ -1,16 +1,24 @@
-import { type Cadence, findSemiTone, semiToneToNote } from "@/notes.ts";
+import {
+  type Cadence,
+  mapNoteToSemiTone,
+  mapSemiToneToNote,
+  semiToneToNote,
+} from "@/notes.ts";
 
-export function transposeCadence(cadence: Cadence, offset: number) {
+export function transposeCadence(cadence: Cadence, offset: number): Cadence {
   return cadence.map((chord) => {
     if (!chord) return undefined;
+
+    const transposedAlteredNote = mapSemiToneToNote(
+      modulo(
+        mapNoteToSemiTone(chord.root) + offset + chord.alteration,
+        12,
+      ) as keyof typeof semiToneToNote,
+    );
+
     return {
-      fundamental:
-        semiToneToNote[
-          modulo(
-            findSemiTone(chord.fundamental) + offset,
-            12,
-          ) as keyof typeof semiToneToNote
-        ],
+      root: transposedAlteredNote.note,
+      alteration: transposedAlteredNote.alteration,
       quality: chord.quality,
     };
   });
