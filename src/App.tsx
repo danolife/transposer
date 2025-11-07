@@ -1,4 +1,3 @@
-import "./App.css";
 import { CadenceInput } from "@/components/CadenceInput.tsx";
 import { OffsetInput } from "@/components/OffsetInput.tsx";
 import { useState } from "react";
