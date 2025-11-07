@@ -10,7 +10,7 @@ export const CadenceOutput: FC<{ outputCadence: Cadence }> = ({
         <div
           key={index}
           className={
-            "h-[72px] bg-primary/2 min-w-[70px] flex items-center justify-center font-semibold rounded"
+            "h-[72px] bg-secondary min-w-[70px] flex items-center justify-center font-semibold rounded text-secondary-foreground"
           }
         >
           {chord && chord.quality && chord.fundamental ? (
@@ -19,7 +19,7 @@ export const CadenceOutput: FC<{ outputCadence: Cadence }> = ({
               {chordQualityNotationSuffix[chord.quality]}
             </>
           ) : (
-            <></>
+            <>-</>
           )}
         </div>
       ))}
